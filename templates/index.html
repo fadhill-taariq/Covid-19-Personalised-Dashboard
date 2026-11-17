@@ -44,6 +44,8 @@
           {{ update['content'] }}
         </div>
       </div>
+      {% else %}
+      <p class="text-muted small">None yet.</p>
       {% endfor %}
     </div>
 
@@ -53,23 +55,33 @@
       <img class="mb-4" src="/static/images/{{ image }}" alt="" width="72" height="72">
       <h1 class="h1 mb-3 font-weight-normal">{{title}}</h1>
 
-      <h2 class="h2 mb-3 font-weight-normal">Local 7-day infection rate in {{local_location}}: {{local_7day_infections}}</h2>
+      {% macro stat(value) %}{% if value is none %}Not available{% else %}{{ "{:,}".format(value) }}{% endif %}{% endmacro %}
 
-      <h2 class="h2 mb-3 font-weight-normal">National 7-day infection rate in {{nation_location}}: {{national_7day_infections}}</h2>
+      <h2 class="h4 mb-3 font-weight-normal">Cases in the last 7 days in {{ covid.location }}: <strong>{{ stat(covid.local_7day_cases) }}</strong></h2>
 
-      <h2 class="h2 mb-3 font-weight-normal">New hospital cases: {{current_hospital_cases}}</h2>
+      <h2 class="h4 mb-3 font-weight-normal">Cases in the last 7 days in {{ covid.nation }}: <strong>{{ stat(covid.national_7day_cases) }}</strong></h2>
 
-      <h2 class="h2 mb-3 font-weight-normal">Total deaths in {{nation_location}}: {{total_deaths}}</h2>
+      <h2 class="h4 mb-3 font-weight-normal">Current hospital cases: <strong>{{ stat(covid.hospital_cases) }}</strong></h2>
+
+      <h2 class="h4 mb-3 font-weight-normal">Total deaths in {{ covid.nation }}: <strong>{{ stat(covid.total_deaths) }}</strong></h2>
+
+      <p class="text-muted small">Data source: {{ covid.source }}</p>
+
+      {% if error %}
+      <div class="alert alert-warning" role="alert">{{ error }}</div>
+      {% endif %}
 
       <br />
       <h3 class="h3 mb-3 font-weight-normal">Schedule data updates</h3>
 
-      <input type="time" name="update" class="form-control">
+      <input type="time" name="update" class="form-control" required>
       <br>
-      <input name="two" placeholder="Update label" required="">
+      <input name="two" class="form-control" placeholder="Update label" required>
       <br>
       <div class="checkbox mb-3">
-          <input type="checkbox" name="repeat" value="repeat">Repeat update
+        <label>
+          <input type="checkbox" name="repeat" value="repeat"> Repeat update daily
+        </label>
       </div>
       <div class="checkbox mb-3">
         <label>
@@ -103,8 +115,11 @@
       </div>
       <div class="toast-body">
         {{ news['content'] }}
+        {% if news['url'] %}<a href="{{ news['url'] }}" target="_blank" rel="noopener">Read more</a>{% endif %}
       </div>
     </div>
+    {% else %}
+    <p class="text-muted small">No headlines to show. Add a NewsAPI key to config.json to see news.</p>
     {% endfor %}
 
   </div>

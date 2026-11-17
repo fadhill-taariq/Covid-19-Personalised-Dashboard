@@ -1,0 +1,4 @@
+Flask>=2.0
+requests>=2.25
+uk-covid19>=1.2
+pytest>=7.0

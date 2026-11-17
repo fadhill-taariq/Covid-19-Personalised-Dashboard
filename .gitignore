@@ -1,0 +1,14 @@
+# Local settings (contains your NewsAPI key)
+config.json
+.env
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+virtual/
+
+# Runtime
+*.log
