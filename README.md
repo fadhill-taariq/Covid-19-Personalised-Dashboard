@@ -1,29 +1,79 @@
-Personalised Covid Dashboard
+# Personalised COVID-19 Dashboard
 
-This dashboard has been created to allow the user to set their location and receive updates on COVID-19 data and news articles based on that location.
+A Flask web dashboard that shows COVID-19 statistics for a chosen local area and nation, alongside the latest COVID news headlines. You can schedule automatic data and news updates for a time of day, either once or daily.
 
-To use this, direct yourself to the config.json file attached. In there, you may assign your country and local area to the respective variables so the dashboard can tailor the covid data to your area. 
+Originally built in late 2021 as coursework for ECM1400 (Programming) at the University of Exeter, and tidied up since.
 
-You will also need to input your own ApiKey for the newsApi which is used in this dashboard, which can be obtained via this website https://newsapi.org/register.
+## Features
 
-This will usually look like a long sequence of different characters. Do not share your API key, as this might lead to you losing access to the news API.
+- **Local and national figures:** cases over the last 7 days for your area and nation, current hospital cases and total deaths.
+- **News headlines:** the latest COVID-related articles from [NewsAPI](https://newsapi.org). Dismissed articles stay hidden after later refreshes.
+- **Scheduled updates:** pick a time, give the update a label, and choose whether to refresh COVID data, news, or both, once or every day. Updates can be cancelled from the dashboard.
+- **Offline fallback:** the UK government coronavirus API the project was built on has since been retired. If a live request fails, the dashboard shows national figures from a bundled snapshot (28 October 2021) and labels them as such.
 
-Enter your API key in quotation marks in the API key section.
+## Project structure
 
-Once these variables have been set, run the covid_news_handling.py file.
-I
-n the terminal you will be shown a link to the covid dashboard (The application will be run on a local server, and will be accessible in your browser at the address: http://127.0.0.1:5000/index.)
+| File | Purpose |
+| --- | --- |
+| `app.py` | Flask app and routes (entry point) |
+| `covid_data_handler.py` | Fetches live figures, parses the CSV snapshot, falls back when the API is unavailable |
+| `covid_news_handling.py` | NewsAPI requests and the store of current and dismissed headlines |
+| `update_scheduler.py` | Schedules, repeats and cancels updates using Python's `sched` module |
+| `config.py` | Loads settings from `config.json` and environment variables |
+| `templates/index.html` | Dashboard page (Bootstrap) |
+| `data/nation_2021-10-28.csv` | National snapshot used for the fallback and tests |
+| `tests/` | pytest suite |
 
-Once clicked you will be directed to the dashboard through your device's default internet browser.
+## Getting started
 
-Once opened, you will be shown the Personalised covid dashboard with your assigned area's covid data. Also there will be five news articles on the right which are the most popular news articles related to the Covid-19 pandemic.
+Requires Python 3.9 or later.
 
-To schedule data updates for a given time, select a time in the drop-down box under 'Schedule data updates'.
+```bash
+git clone https://github.com/fadhill-taariq/Covid-19-Personalised-Dashboard.git
+cd Covid-19-Personalised-Dashboard
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-Select an update time of your choosing, along with options to repeat this update at this time and whether you would like the covid data or news articles to update, or both.
+### Configuration
 
-Click submit and you will see your scheduled updates on the right hand side of the website.
+Copy the example config and edit it:
 
+```bash
+cp config.example.json config.json
+```
 
-Note that the dashboard will retain full functionality as long as it is being run. 
-Exiting or interrupting the command line when the application is running will stop the execution. Any scheduled updates will be deleted.
+| Setting | Meaning |
+| --- | --- |
+| `news_api_key` | Your free key from [newsapi.org/register](https://newsapi.org/register). Leave blank to run without news. |
+| `location_country` | Nation to show, e.g. `England` |
+| `local_location` | Local area, e.g. `Exeter` |
+| `local_location_type` | Area type used by the API, e.g. `ltla` (lower-tier local authority) |
+| `news_search_terms` | Space-separated terms; an article matching any of them is included |
+
+`config.json` is git-ignored so your key is never committed. You can also set the key as an environment variable instead:
+
+```bash
+export NEWS_API_KEY=your-key-here
+```
+
+### Running
+
+```bash
+python app.py
+```
+
+Then open <http://127.0.0.1:5000/index>. The page refreshes every minute, which is also when due scheduled updates run. Scheduled updates are held in memory, so they are lost when the app stops.
+
+### Tests
+
+```bash
+pytest
+```
+
+The tests do not need network access or an API key: API calls are replaced with fakes and the scheduler runs on a simulated clock.
+
+## Credits
+
+The page template is based on the starter template provided for ECM1400. COVID data © UK Health Security Agency, published under the Open Government Licence.
