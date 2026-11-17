@@ -1,135 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta http-equiv="refresh" content="60;url='/index'">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="Basic form for alarm data entry. Template for ECM1400 CA3 2020. ">
-    <meta name="author" content="Matt Collison">
-    {% if favicon: %}
-    <link rel="icon" href="{{favicon}}">
-    {% endif %}
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="60;url='/index'">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Personalised COVID-19 dashboard. Based on the ECM1400 CA3 template by Matt Collison.">
+  {% if favicon %}
+  <link rel="icon" href="{{ favicon }}">
+  {% endif %}
 
-    <title>ECM1400 Personalised Covid Dashboard</title>
-    <link rel="canonical" href="https://getbootstrap.com/docs/4.0/examples/sign-in/">
+  <title>Personalised Covid Dashboard</title>
 
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  <!-- Bootstrap 4.6.2 (MIT licence), bundled so the page works offline -->
+  <link rel="stylesheet" href="/static/css/bootstrap.min.css">
 
+  <style>
+    :root {
+      --bg: #f3f5f8;
+      --panel: #ffffff;
+      --border: #dde2ea;
+      --text: #1f2933;
+      --muted: #6b7684;
+      --accent: #2563eb;
+      --accent-soft: #eef3fe;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .site-header {
+      background: var(--panel);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      margin-bottom: 1.5rem;
+    }
+    .site-header img { width: 44px; height: 44px; border-radius: 8px; margin-right: .75rem; }
+    .site-header h1 { font-size: 1.5rem; margin: 0; font-weight: 600; }
+    .site-header .subtitle { color: var(--muted); font-size: .875rem; }
 
-  </head>
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+    }
+    .panel-title {
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: .6rem;
+      margin-bottom: 1rem;
+    }
 
-  <body class="text-center">
-    <div class="container">
-      <div class="row">
+    .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+    .stat {
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: .75rem .9rem;
+      background: #fbfcfe;
+    }
+    .stat-label { font-size: .8rem; color: var(--muted); line-height: 1.3; }
+    .stat-value { font-size: 1.6rem; font-weight: 600; margin-top: .25rem; }
+    .stat-value.na { font-size: 1rem; font-weight: 500; color: var(--muted); }
+    .source-note { color: var(--muted); font-size: .8rem; margin: .9rem 0 0; }
 
-    <!-- UPDATES COLUMN -->
-    <div class="col-sm">
-      Scheduled updates:
+    .item {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .75rem .9rem;
+      margin-bottom: .75rem;
+      background: var(--panel);
+    }
+    .item:last-child { margin-bottom: 0; }
+    .item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+    .item-title { font-weight: 600; font-size: .95rem; line-height: 1.35; }
+    .item-body { color: var(--muted); font-size: .875rem; margin-top: .35rem; }
+    .item-body a { font-weight: 500; }
+    .update-item { background: var(--accent-soft); border-color: #cfdcfb; }
 
-      {% for update in updates: %}
-      <div class="toast" data-autohide="false">
-        <div class="toast-header">
-          <strong class="mr-auto">{{ update['title'] }}</strong>
-          <form action="/index" method="get">
-          <button type="submit" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" name=update_item value="{{ update['title'] }}">
-            <span aria-hidden="true">&times;</span>
-          </button>
-          </form>
-        </div>
-        <div class="toast-body">
-          {{ update['content'] }}
-        </div>
-      </div>
-      {% else %}
-      <p class="text-muted small">None yet.</p>
-      {% endfor %}
-    </div>
+    .dismiss {
+      border: none; background: none; color: var(--muted);
+      font-size: 1.25rem; line-height: 1; padding: 0 .2rem; cursor: pointer;
+    }
+    .dismiss:hover { color: var(--text); }
 
-    <div class="col-sm">
+    .empty { color: var(--muted); font-size: .875rem; margin: 0; }
+    .form-check { margin-bottom: .4rem; }
+    footer { color: var(--muted); font-size: .8rem; text-align: center; padding: .5rem 0 2rem; }
+  </style>
+</head>
 
-    <form action="/index" method="get" class="form-alarms">
-      <img class="mb-4" src="/static/images/{{ image }}" alt="" width="72" height="72">
-      <h1 class="h1 mb-3 font-weight-normal">{{title}}</h1>
-
-      {% macro stat(value) %}{% if value is none %}Not available{% else %}{{ "{:,}".format(value) }}{% endif %}{% endmacro %}
-
-      <h2 class="h4 mb-3 font-weight-normal">Cases in the last 7 days in {{ covid.location }}: <strong>{{ stat(covid.local_7day_cases) }}</strong></h2>
-
-      <h2 class="h4 mb-3 font-weight-normal">Cases in the last 7 days in {{ covid.nation }}: <strong>{{ stat(covid.national_7day_cases) }}</strong></h2>
-
-      <h2 class="h4 mb-3 font-weight-normal">Current hospital cases: <strong>{{ stat(covid.hospital_cases) }}</strong></h2>
-
-      <h2 class="h4 mb-3 font-weight-normal">Total deaths in {{ covid.nation }}: <strong>{{ stat(covid.total_deaths) }}</strong></h2>
-
-      <p class="text-muted small">Data source: {{ covid.source }}</p>
-
-      {% if error %}
-      <div class="alert alert-warning" role="alert">{{ error }}</div>
-      {% endif %}
-
-      <br />
-      <h3 class="h3 mb-3 font-weight-normal">Schedule data updates</h3>
-
-      <input type="time" name="update" class="form-control" required>
-      <br>
-      <input name="two" class="form-control" placeholder="Update label" required>
-      <br>
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" name="repeat" value="repeat"> Repeat update daily
-        </label>
-      </div>
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" name="covid-data" value="covid-data"> Update Covid data
-        </label>
-      </div>
-      <div class="checkbox mb-3">
-        <label>
-          <input type="checkbox" name="news" value="news"> Update news articles
-        </label>
-      </div>
-      <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
-      <p class="mt-5 mb-3 text-muted">© 2021</p>
-    </form>
-
-  </div>
-
-
-  <!-- NEWS COLUMN -->
-  <div class="col-sm">
-    News headlines:
-    {% for news in news_articles: %}
-    <div class="toast" data-autohide="false">
-      <div class="toast-header">
-        <strong class="mr-auto">{{ news['title'] }}</strong>
-        <form action="/index" method="get">
-        <button type="submit" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close" name=notif value="{{ news['title'] }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
-        </form>
-      </div>
-      <div class="toast-body">
-        {{ news['content'] }}
-        {% if news['url'] %}<a href="{{ news['url'] }}" target="_blank" rel="noopener">Read more</a>{% endif %}
-      </div>
-    </div>
+<body>
+  {% macro stat(label, value) %}
+  <div class="stat">
+    <div class="stat-label">{{ label }}</div>
+    {% if value is none %}
+    <div class="stat-value na">Not available</div>
     {% else %}
-    <p class="text-muted small">No headlines to show. Add a NewsAPI key to config.json to see news.</p>
-    {% endfor %}
-
+    <div class="stat-value">{{ "{:,}".format(value) }}</div>
+    {% endif %}
   </div>
-</div>
-</div>
+  {% endmacro %}
 
-<script>
-    $(document).ready(function() {
-        $(".toast").toast('show');
-    });
-</script>
+  <header class="site-header">
+    <div class="container d-flex align-items-center">
+      <img src="/static/images/{{ image }}" alt="">
+      <div>
+        <h1>{{ title }}</h1>
+        <div class="subtitle">{{ covid.location }}, {{ covid.nation }}</div>
+      </div>
+    </div>
+  </header>
 
-</body></html>
+  <main class="container">
+    <div class="row">
+
+      <!-- DATA AND SCHEDULING COLUMN -->
+      <div class="col-lg-5 order-lg-2">
+        <section class="panel">
+          <div class="panel-title">Covid-19 figures</div>
+          <div class="stat-grid">
+            {{ stat("Cases in the last 7 days in " ~ covid.location, covid.local_7day_cases) }}
+            {{ stat("Cases in the last 7 days in " ~ covid.nation, covid.national_7day_cases) }}
+            {{ stat("Current hospital cases", covid.hospital_cases) }}
+            {{ stat("Total deaths in " ~ covid.nation, covid.total_deaths) }}
+          </div>
+          <p class="source-note">Data source: {{ covid.source }}</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">Schedule an update</div>
+          {% if error %}
+          <div class="alert alert-warning py-2" role="alert">{{ error }}</div>
+          {% endif %}
+          <form action="/index" method="get">
+            <div class="form-row">
+              <div class="form-group col-5">
+                <label for="update-time" class="small text-muted mb-1">Time</label>
+                <input id="update-time" type="time" name="update" class="form-control" required>
+              </div>
+              <div class="form-group col-7">
+                <label for="update-label" class="small text-muted mb-1">Label</label>
+                <input id="update-label" name="two" class="form-control" placeholder="e.g. Morning refresh" required>
+              </div>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="covid-data" value="covid-data" id="opt-covid">
+              <label class="form-check-label" for="opt-covid">Update Covid data</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="news" value="news" id="opt-news">
+              <label class="form-check-label" for="opt-news">Update news articles</label>
+            </div>
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" name="repeat" value="repeat" id="opt-repeat">
+              <label class="form-check-label" for="opt-repeat">Repeat every day</label>
+            </div>
+            <button class="btn btn-primary btn-block" type="submit">Schedule update</button>
+          </form>
+        </section>
+      </div>
+
+      <!-- SCHEDULED UPDATES COLUMN -->
+      <div class="col-lg-3 order-lg-1">
+        <section class="panel">
+          <div class="panel-title">Scheduled updates</div>
+          {% for update in updates %}
+          <div class="item update-item">
+            <div class="item-head">
+              <div class="item-title">{{ update['title'] }}</div>
+              <form action="/index" method="get">
+                <button type="submit" class="dismiss" aria-label="Cancel update" title="Cancel update" name="update_item" value="{{ update['title'] }}">&times;</button>
+              </form>
+            </div>
+            <div class="item-body">{{ update['content'] }}</div>
+          </div>
+          {% else %}
+          <p class="empty">None yet.</p>
+          {% endfor %}
+        </section>
+      </div>
+
+      <!-- NEWS COLUMN -->
+      <div class="col-lg-4 order-lg-3">
+        <section class="panel">
+          <div class="panel-title">News headlines</div>
+          {% for news in news_articles %}
+          <article class="item">
+            <div class="item-head">
+              <div class="item-title">{{ news['title'] }}</div>
+              <form action="/index" method="get">
+                <button type="submit" class="dismiss" aria-label="Dismiss article" title="Dismiss article" name="notif" value="{{ news['title'] }}">&times;</button>
+              </form>
+            </div>
+            <div class="item-body">
+              {{ news['content'] }}
+              {% if news['url'] %}<a href="{{ news['url'] }}" target="_blank" rel="noopener">Read more</a>{% endif %}
+            </div>
+          </article>
+          {% else %}
+          <p class="empty">No headlines to show. Add a NewsAPI key to config.json to see news.</p>
+          {% endfor %}
+        </section>
+      </div>
+
+    </div>
+  </main>
+
+  <footer>© 2021 · Page refreshes every minute</footer>
+</body>
+</html>

@@ -20,7 +20,8 @@ Originally built in late 2021 as coursework for ECM1400 (Programming) at the Uni
 | `covid_news_handling.py` | NewsAPI requests and the store of current and dismissed headlines |
 | `update_scheduler.py` | Schedules, repeats and cancels updates using Python's `sched` module |
 | `config.py` | Loads settings from `config.json` and environment variables |
-| `templates/index.html` | Dashboard page (Bootstrap) |
+| `templates/index.html` | Dashboard page |
+| `static/` | Image and bundled Bootstrap stylesheet |
 | `data/nation_2021-10-28.csv` | National snapshot used for the fallback and tests |
 | `tests/` | pytest suite |
 
@@ -76,4 +77,4 @@ The tests do not need network access or an API key: API calls are replaced with 
 
 ## Credits
 
-The page template is based on the starter template provided for ECM1400. COVID data © UK Health Security Agency, published under the Open Government Licence.
+The page layout started from the starter template provided for ECM1400. Styling uses [Bootstrap 4](https://getbootstrap.com) (MIT licence), bundled in `static/css`. COVID data © UK Health Security Agency, published under the Open Government Licence.
